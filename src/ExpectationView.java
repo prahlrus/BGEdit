@@ -1,5 +1,6 @@
 import java.awt.Panel;
-import java.awt.GridLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 import java.awt.Choice;
 import java.awt.Label;
 
@@ -47,23 +48,6 @@ public class ExpectationView extends Panel {
 		rebuild();
 	}
 
-	private void rebuild() {
-		GridLayout grid = new GridLayout(0, (2 * selections[0].length) + 1);
-		setLayout(grid);
-		String[] bgLabels = new String[selections[0].length];
-		for (int y = 0; y < bgLabels.length; y++) {
-			bgLabels[y] = bgs.get(y).getName();
-		}
-
-		for (int x = 0; x < selections.length; x++) {
-			for (int y = 0; y < selections[0].length; y++) {
-				add(selections[x][y]);
-				add(new Label(bgLabels[y]));
-			}
-			add(new Label(des.get(x).getName()));
-		}
-	}
-
 	private Choice makeChoice() {
 		Choice c = new Choice();
 		c.addItem(" ");
@@ -73,8 +57,36 @@ public class ExpectationView extends Panel {
 		return c;
 	}
 
+	private void rebuild() {
+		GridBagLayout gb = new GridBagLayout();
+		GridBagConstraints gbc = new GridBagConstraints();
+		setLayout(gb);
+		gbc.fill = GridBagConstraints.BOTH;
 
-/*
+		String[] bgLabels = new String[selections[0].length];
+		for (int y = 0; y < bgLabels.length; y++) {
+			bgLabels[y] = bgs.get(y).getName();
+		}
+
+		for (int x = 0; x < selections.length; x++) {
+			gbc.gridwidth = 1;
+			for (int y = 0; y < selections[0].length; y++) {
+				gbc.weightx = 0.0;
+				gb.setConstraints(selections[x][y],gbc);
+				add(selections[x][y]);
+
+				gbc.weightx = 1.0;
+				Label l = new Label(bgLabels[y]);
+				gb.setConstraints(l,gbc);
+				add(l);
+			}
+			gbc.gridwidth = GridBagConstraints.REMAINDER;
+			Label l = new Label(des.get(x).getName());
+			gb.setConstraints(l,gbc);
+			add(l);
+		}
+	}
+
 	public void addBackground(Background bg) {
 		int i = 0;
 		while (i<bgs.size()) {
@@ -82,7 +94,27 @@ public class ExpectationView extends Panel {
 				break;
 		}
 		bgs.add(i,bg);
+
+		// create a new column in the selections array
+		Choice[][] updated = new Choice[selections.length][selections[0].length + 1];
+		for (int x = 0; x < updated.length; x++) {
+			for (int y = 0; y < updated[0].length; y++) {
+				if  (y < i) {
+					updated[x][y] = selections[x][y];
+				} else if (y == i) {
+					updated[x][y] = makeChoice();
+				} else {
+					updated[x][y] = selections[x][y-1];
+				}
+			}
+		}
+		selections = updated;
+
+		// rebuild the layout
+		removeAll();
 		rebuild();
+		revalidate();
+		repaint();
 	}
 
 	public void addDescriptor(Descriptor de) {
@@ -92,7 +124,25 @@ public class ExpectationView extends Panel {
 				break;
 		}
 		des.add(i,de);
+
+		// create a new row in the selections array
+		Choice[][] updated = new Choice[selections.length + 1][selections[0].length];
+		for (int x = 0; x < updated.length; x++) {
+			if (x < 1) 
+				for (int y = 0; y < updated[0].length; y++)
+					updated[x][y] = selections[x][y];
+			else if (x == i)
+				for (int y = 0; y < updated[0].length; y++)
+					updated[x][y] = makeChoice();
+			else
+				for (int y = 0; y < updated[0].length; y++)
+					updated[x][y] = selections[x-1][y];
+		}	
+		selections = updated;
+
+		// rebuild the layout
+		removeAll();
 		rebuild();
-	}
-	*/
+		revalidate();
+		repaint();	}
 }

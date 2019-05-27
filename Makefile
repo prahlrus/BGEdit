@@ -12,6 +12,7 @@ CLASSES = Descriptor \
 	ExpectationType \
 	Expectation \
 	ExpectationView \
+	LatexReader \
 	EditorWindow
 
 CLSFILES = $(addprefix $(CLSDIR)/, $(addsuffix .class, $(CLASSES)))

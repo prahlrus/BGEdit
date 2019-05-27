@@ -16,6 +16,10 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.ArrayList;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 /**
  * Top-level Component for the application.
  */
@@ -57,40 +61,17 @@ public class EditorWindow extends Frame implements WindowListener, ActionListene
       )
     );
 
-    add(pane, bl.NORTH);
+    add(pane, bl.CENTER);
 
     entry = new TextField("Hoboken");
     add(entry, bl.SOUTH);
 
-    pack();
-  }
-
-  public static void main(String[] args) {
-    Background urban, rural;
-    List<Background> bgs = new ArrayList<Background>();
-    bgs.add(urban = new Background("Rural"));
-    bgs.add(rural = new Background("Urban"));
-
-    Descriptor hale, quick;
-    List<Descriptor> des = new ArrayList<Descriptor>();
-    des.add(hale = new Descriptor("hale"));
-    des.add(quick = new Descriptor("quick"));
-
-    List<Expectation> exps = new ArrayList<Expectation>();
-    exps.add(
-      new Expectation(urban, ExpectationType.ORDINARY, quick)
-    );
-    exps.add(
-      new Expectation(rural, ExpectationType.ORDINARY, hale)
-    );
-
-    EditorWindow e = new EditorWindow(bgs, des, exps);
-    e.setVisible(true);
+    setSize(300,200);
   }
 
   /* ActionListener methods */
   public void actionPerformed(ActionEvent e) {
-    /*
+    
     String cmd = e.getActionCommand();
     if (cmd.equals("Create Background")){
       view.addBackground(new Background(entry.getText()));
@@ -98,10 +79,6 @@ public class EditorWindow extends Frame implements WindowListener, ActionListene
     else if (cmd.equals("Create Descriptor")) {
       view.addDescriptor(new Descriptor(entry.getText()));
     }
-
-    view.revalidate();
-    view.repaint();
-    */
   }
 
   /* WindowListener methods */
@@ -115,4 +92,32 @@ public class EditorWindow extends Frame implements WindowListener, ActionListene
   public void windowDeactivated(WindowEvent e) {}
   public void windowDeiconified(WindowEvent e) {}
   public void windowIconified(WindowEvent e) {}
+
+  public static void main(String[] args) {
+    EditorWindow e = fromFiles(new String[]{"decat.tex"});
+    e.setVisible(true);
+  }
+
+  public static EditorWindow fromFiles(String[] filenames) {
+    LatexReader reader = new LatexReader();
+    for (String filename : filenames) {
+      File file = new File(filename);
+      try {
+        Scanner input = new Scanner (file);
+        reader.read(input);
+      } catch (FileNotFoundException e) {
+        System.err.println("No such file: " + filename);
+        continue;
+      }
+    }
+
+    Background urban, rural;
+    List<Background> bgs = new ArrayList<Background>();
+    bgs.add(urban = new Background("Rural"));
+    bgs.add(rural = new Background("Urban"));
+    List<Descriptor> des = reader.getDescriptors();
+    List<Expectation> exps = new ArrayList<Expectation>();
+    return new EditorWindow(bgs, des, exps);
+
+  }
 }
