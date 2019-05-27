@@ -1,3 +1,6 @@
+package com.stinja.birg.Application;
+import com.stinja.birg.Entities.*;
+
 import java.awt.Panel;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;

@@ -1,3 +1,5 @@
+package com.stinja.birg.Entities;
+
 import java.util.Set;
 
 /**

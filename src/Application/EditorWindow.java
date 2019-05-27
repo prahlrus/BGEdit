@@ -1,3 +1,6 @@
+package com.stinja.birg.Application;
+import com.stinja.birg.Entities.*;
+
 import java.awt.Frame;
 import java.awt.BorderLayout;
 

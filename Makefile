@@ -1,36 +1,36 @@
-SRCDIR=src
-CLSDIR=classes
+SRCDIR=src/
+BINDIR=target/com/stinja/birg
 
 JC=javac
-JFLAGS=-d $(CLSDIR)/ -sourcepath $(SRCDIR)
+JFLAGS=-d $(BINDIR)/ -cp $(BINDIR)
 JARNAME=BGEditor
 
 #################################################################
 
-CLASSES = Descriptor \
-	Background \
-	ExpectationType \
-	Expectation \
-	ExpectationView \
+APPCLASSES = ExpectationView \
 	LatexReader \
 	EditorWindow
 
-CLSFILES = $(addprefix $(CLSDIR)/, $(addsuffix .class, $(CLASSES)))
+ENTCLASSES = Descriptor \
+	Background \
+	ExpectationType \
+	Expectation 
 
-MAIN = EditorWindow
+CLSFILES = $(addsuffix .class, $(addprefix $(BINDIR)/Entities/, $(ENTCLASSES)) $(addprefix $(BINDIR)/Application/, $(APPCLASSES)))
+
+MAIN = com.stinja.birg.Application.EditorWindow
 
 #################################################################
 
 build: $(JARNAME).jar
 
 $(JARNAME).jar: $(CLSFILES)
-	jar cef $(MAIN) $@ -C $(CLSDIR) .
+	jar cef $(MAIN) $@ -C $(BINDIR) .
 	@echo "Build successful!"
 
-$(CLSDIR)/%.class: $(SRCDIR)/%.java
+$(BINDIR)/%.class: $(SRCDIR)/%.java
 	@echo "Building " $@ "..."
 	$(JC) $(JFLAGS) $<
 
 clean:
-	rm -f $(JARNAME).jar $(CLSDIR)/* 
-
+	rm -rf $(JARNAME).jar $(BINDIR)/* 

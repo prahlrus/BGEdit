@@ -1,3 +1,6 @@
+package com.stinja.birg.Application;
+import com.stinja.birg.Entities.Descriptor;
+
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 

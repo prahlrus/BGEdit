@@ -1,3 +1,5 @@
+package com.stinja.birg.Entities;
+
 /**
  * Linking entity for Backgrounds and Descriptors
  */
