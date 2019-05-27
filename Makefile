@@ -9,7 +9,9 @@ JARNAME=BGEditor
 
 CLASSES = Descriptor \
 	Background \
-	BackgroundDescriptorView \
+	ExpectationType \
+	Expectation \
+	ExpectationView \
 	EditorWindow
 
 CLSFILES = $(addprefix $(CLSDIR)/, $(addsuffix .class, $(CLASSES)))
