@@ -1,5 +1,6 @@
-SRCDIR=src/
-BINDIR=target/com/stinja/birg
+SRCDIR=src
+BINDIR=target
+PACKDIR=com/stinja/birg
 
 JC=javac
 JFLAGS=-d $(BINDIR)/ -cp $(BINDIR)
@@ -7,16 +8,20 @@ JARNAME=BGEditor
 
 #################################################################
 
-APPCLASSES = ExpectationView \
+APPCLASSES = $(addprefix Application/, \
+	ExpectationView \
 	LatexReader \
-	EditorWindow
+	EditorWindow )
 
-ENTCLASSES = Descriptor \
+ENTCLASSES = $(addprefix Entities/, \
+	Descriptor \
 	Background \
 	ExpectationType \
-	Expectation 
+	Expectation \
+	Observer \
+	DataModel )
 
-CLSFILES = $(addsuffix .class, $(addprefix $(BINDIR)/Entities/, $(ENTCLASSES)) $(addprefix $(BINDIR)/Application/, $(APPCLASSES)))
+CLSFILES = $(addprefix $(BINDIR)/$(PACKDIR)/, $(addsuffix .class, $(ENTCLASSES) $(APPCLASSES)))
 
 MAIN = com.stinja.birg.Application.EditorWindow
 
@@ -28,7 +33,7 @@ $(JARNAME).jar: $(CLSFILES)
 	jar cef $(MAIN) $@ -C $(BINDIR) .
 	@echo "Build successful!"
 
-$(BINDIR)/%.class: $(SRCDIR)/%.java
+$(BINDIR)/$(PACKDIR)/%.class: $(SRCDIR)/%.java
 	@echo "Building " $@ "..."
 	$(JC) $(JFLAGS) $<
 

@@ -32,16 +32,16 @@ public class EditorWindow extends Frame implements WindowListener, ActionListene
   private ExpectationView view;
   private TextField entry;
 
+  private DataModel dm;
+
   private Menu edit;
   private MenuItem createBackground, createDescriptor;
 
-  public EditorWindow ( 
-    List<Background> bgs,
-    List<Descriptor> des,
-    List<Expectation> exs 
-    ) {
+  public EditorWindow ( DataModel dm ) {
     super();
     addWindowListener(this);
+
+    this.dm = dm;
 
     setTitle("BIRG Background Editor");
     BorderLayout bl = new BorderLayout();
@@ -57,13 +57,7 @@ public class EditorWindow extends Frame implements WindowListener, ActionListene
     createDescriptor.addActionListener(this);
 
     pane = new ScrollPane(ScrollPane.SCROLLBARS_AS_NEEDED);
-    pane.add(view = new ExpectationView
-      ( bgs 
-      , des 
-      , exs
-      )
-    );
-
+    pane.add(view = new ExpectationView(dm));
     add(pane, bl.CENTER);
 
     entry = new TextField("Hoboken");
@@ -77,10 +71,10 @@ public class EditorWindow extends Frame implements WindowListener, ActionListene
     
     String cmd = e.getActionCommand();
     if (cmd.equals("Create Background")){
-      view.addBackground(new Background(entry.getText()));
+      dm.registerBackground(new Background(entry.getText()));
     }
     else if (cmd.equals("Create Descriptor")) {
-      view.addDescriptor(new Descriptor(entry.getText()));
+      dm.registerDescriptor(new Descriptor(entry.getText()));
     }
   }
 
@@ -102,12 +96,14 @@ public class EditorWindow extends Frame implements WindowListener, ActionListene
   }
 
   public static EditorWindow fromFiles(String[] filenames) {
+    DataModel dm = new DataModel(null, null, null);
+
     LatexReader reader = new LatexReader();
     for (String filename : filenames) {
       File file = new File(filename);
       try {
         Scanner input = new Scanner (file);
-        reader.read(input);
+        reader.read(input, dm);
       } catch (FileNotFoundException e) {
         System.err.println("No such file: " + filename);
         continue;
@@ -115,12 +111,9 @@ public class EditorWindow extends Frame implements WindowListener, ActionListene
     }
 
     Background urban, rural;
-    List<Background> bgs = new ArrayList<Background>();
-    bgs.add(urban = new Background("Rural"));
-    bgs.add(rural = new Background("Urban"));
-    List<Descriptor> des = reader.getDescriptors();
-    List<Expectation> exps = new ArrayList<Expectation>();
-    return new EditorWindow(bgs, des, exps);
-
+    dm.registerBackground(urban = new Background("Rural"));
+    dm.registerBackground(rural = new Background("Urban"));
+    
+    return new EditorWindow(dm);
   }
 }

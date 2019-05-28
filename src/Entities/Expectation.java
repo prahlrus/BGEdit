@@ -42,4 +42,12 @@ public class Expectation
   public void setDescriptor(Descriptor descriptor) {
     this.descriptor = descriptor;
   }
+
+  public boolean matches(Expectation x) {
+    return background.equals(x.background) && descriptor.equals(x.descriptor);
+  }
+
+  public void update(Expectation x) {
+    this.expectationType = x.expectationType;
+  }
 }
