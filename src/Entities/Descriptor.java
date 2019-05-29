@@ -23,6 +23,10 @@ public class Descriptor implements Comparable<Descriptor>
   public String getName() {
     return name;
   }
+
+  public String getBase() {
+    return base;
+  }
   
   public void update(Descriptor o) {
     if (base == null) base = o.base;

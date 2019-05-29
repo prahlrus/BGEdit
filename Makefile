@@ -11,6 +11,8 @@ JARNAME=BGEditor
 APPCLASSES = $(addprefix Application/, \
 	ExpectationView \
 	LatexReader \
+	DataDialog \
+	DescriptorDialog \
 	EditorWindow )
 
 ENTCLASSES = $(addprefix Entities/, \

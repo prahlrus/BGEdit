@@ -30,12 +30,10 @@ public class EditorWindow extends Frame implements WindowListener, ActionListene
 {
   private ScrollPane pane;
   private ExpectationView view;
-  private TextField entry;
 
   private DataModel dm;
-
   private Menu edit;
-  private MenuItem createBackground, createDescriptor;
+  private MenuItem registerBackground, registerDescriptor;
 
   public EditorWindow ( DataModel dm ) {
     super();
@@ -49,32 +47,32 @@ public class EditorWindow extends Frame implements WindowListener, ActionListene
 
     MenuBar mb = new MenuBar();
     mb.add(edit = new Menu("Edit"));
-    edit.add(createBackground = new MenuItem("Create Background"));
-    edit.add(createDescriptor = new MenuItem("Create Descriptor"));
+
+    edit.add(registerBackground = new MenuItem("Create/update Background"));
+    registerBackground.setActionCommand("registerBackground");
+    registerBackground.addActionListener(this);
+
+    edit.add(registerDescriptor = new MenuItem("Create/update Descriptor"));
+    registerDescriptor.setActionCommand("registerDescriptor");
+    registerDescriptor.addActionListener(this);
 
     setMenuBar(mb);
-    createBackground.addActionListener(this);
-    createDescriptor.addActionListener(this);
 
     pane = new ScrollPane(ScrollPane.SCROLLBARS_AS_NEEDED);
     pane.add(view = new ExpectationView(dm));
     add(pane, bl.CENTER);
 
-    entry = new TextField("Hoboken");
-    add(entry, bl.SOUTH);
-
-    setSize(300,200);
+    setSize(500,300);
   }
 
   /* ActionListener methods */
   public void actionPerformed(ActionEvent e) {
     
     String cmd = e.getActionCommand();
-    if (cmd.equals("Create Background")){
-      dm.registerBackground(new Background(entry.getText()));
-    }
-    else if (cmd.equals("Create Descriptor")) {
-      dm.registerDescriptor(new Descriptor(entry.getText()));
+    if (cmd.equals("registerDescriptor")) {
+      DescriptorDialog d = new DescriptorDialog(this, dm, null);
+      d.setLocationRelativeTo(this);
+      d.setVisible(true);
     }
   }
 
