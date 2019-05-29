@@ -10,7 +10,7 @@ JARNAME=BGEditor
 
 APPCLASSES = $(addprefix Application/, \
 	ExpectationView \
-	LatexReader \
+	LoadingDialog \
 	DataDialog \
 	DescriptorDialog \
 	EditorWindow )

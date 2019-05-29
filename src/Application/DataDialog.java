@@ -21,6 +21,8 @@ public abstract class DataDialog
 
 	protected DataDialog(Frame owner, String title, DataModel dm) {
 		super(owner, title);
+    setLocationRelativeTo(owner);
+
     this.dm = dm;
 
     addWindowListener(this);

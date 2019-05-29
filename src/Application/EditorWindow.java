@@ -5,6 +5,7 @@ import java.awt.Frame;
 import java.awt.BorderLayout;
 
 import java.awt.ScrollPane;
+import java.awt.Panel;
 import java.awt.TextField;
 
 import java.awt.MenuBar;
@@ -19,21 +20,20 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.ArrayList;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
-
 /**
  * Top-level Component for the application.
  */
 public class EditorWindow extends Frame implements WindowListener, ActionListener
 {
   private ScrollPane pane;
-  private ExpectationView view;
+  private Panel currentView;
+  private ExpectationView expectationView;
 
   private DataModel dm;
-  private Menu edit;
+  private Menu file, view, edit;
   private MenuItem registerBackground, registerDescriptor;
+  private MenuItem load, export;
+  private MenuItem byExpectations;
 
   public EditorWindow ( DataModel dm ) {
     super();
@@ -46,20 +46,33 @@ public class EditorWindow extends Frame implements WindowListener, ActionListene
     setLayout(bl);
 
     MenuBar mb = new MenuBar();
+    mb.add(file = new Menu("File"));
+
+    file.add(load = new MenuItem("Load more data"));
+    load.setActionCommand("load");
+    load.addActionListener(this);
+    file.add(export = new MenuItem("Export data"));
+    export.setActionCommand("export");
+    export.addActionListener(this);
+
+    mb.add(view = new Menu("View"));
+
+    view.add(byExpectations = new MenuItem("By expectations"));
+    byExpectations.setActionCommand("expectationView");
+    byExpectations.addActionListener(this);
+
     mb.add(edit = new Menu("Edit"));
 
-    edit.add(registerBackground = new MenuItem("Create/update Background"));
+    edit.add(registerBackground = new MenuItem("Create/update background"));
     registerBackground.setActionCommand("registerBackground");
     registerBackground.addActionListener(this);
-
-    edit.add(registerDescriptor = new MenuItem("Create/update Descriptor"));
+    edit.add(registerDescriptor = new MenuItem("Create/update descriptor"));
     registerDescriptor.setActionCommand("registerDescriptor");
     registerDescriptor.addActionListener(this);
 
     setMenuBar(mb);
 
     pane = new ScrollPane(ScrollPane.SCROLLBARS_AS_NEEDED);
-    pane.add(view = new ExpectationView(dm));
     add(pane, bl.CENTER);
 
     setSize(500,300);
@@ -69,10 +82,32 @@ public class EditorWindow extends Frame implements WindowListener, ActionListene
   public void actionPerformed(ActionEvent e) {
     
     String cmd = e.getActionCommand();
-    if (cmd.equals("registerDescriptor")) {
-      DescriptorDialog d = new DescriptorDialog(this, dm, null);
-      d.setLocationRelativeTo(this);
+    
+    if (cmd.equals("load")) {
+      LoadingDialog d = new LoadingDialog(this, dm);
       d.setVisible(true);
+    } 
+
+    else if (cmd.equals("expectationView")) {
+      switchToExpectationView();
+    } 
+
+    else if (cmd.equals("registerDescriptor")) {
+      DescriptorDialog d = new DescriptorDialog(this, dm, null);
+      d.setVisible(true);
+    }
+  }
+
+  private void switchToExpectationView() {
+    if (expectationView == null)
+    expectationView = new ExpectationView(dm);
+
+    if (currentView != expectationView) {
+      if (currentView != null)
+        pane.removeAll();
+      pane.add(currentView = expectationView);
+      pane.revalidate();
+      pane.repaint();
     }
   }
 
@@ -89,29 +124,15 @@ public class EditorWindow extends Frame implements WindowListener, ActionListene
   public void windowIconified(WindowEvent e) {}
 
   public static void main(String[] args) {
-    EditorWindow e = fromFiles(new String[]{"decat.tex"});
-    e.setVisible(true);
-  }
-
-  public static EditorWindow fromFiles(String[] filenames) {
-    DataModel dm = new DataModel(null, null, null);
-
-    LatexReader reader = new LatexReader();
-    for (String filename : filenames) {
-      File file = new File(filename);
-      try {
-        Scanner input = new Scanner (file);
-        reader.read(input, dm);
-      } catch (FileNotFoundException e) {
-        System.err.println("No such file: " + filename);
-        continue;
-      }
-    }
-
+    DataModel dm = new DataModel();
     Background urban, rural;
     dm.registerBackground(urban = new Background("Rural"));
     dm.registerBackground(rural = new Background("Urban"));
-    
-    return new EditorWindow(dm);
+
+    EditorWindow e = new EditorWindow(dm);
+    e.setVisible(true);
+    LoadingDialog d = new LoadingDialog(e, dm);
+    d.setLocationRelativeTo(e);
+    d.setVisible(true);
   }
 }
